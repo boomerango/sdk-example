@@ -1,0 +1,173 @@
+.worker-test {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.worker-test h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.worker-test-description {
+  margin: 0 0 24px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.worker-status-section,
+.worker-logs-section,
+.worker-code-section {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.worker-status-section:last-child,
+.worker-logs-section:last-child,
+.worker-code-section:last-child {
+  margin-bottom: 0;
+}
+
+.worker-test h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.worker-status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-label {
+  font-weight: 500;
+  color: #666;
+  min-width: 100px;
+}
+
+.status-value {
+  font-family: 'Courier New', monospace;
+  color: #333;
+}
+
+.status-value.running {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.status-value.paused {
+  color: #f57c00;
+  font-weight: 600;
+}
+
+.worker-status-placeholder,
+.worker-logs-placeholder {
+  color: #999;
+  font-style: italic;
+  padding: 12px;
+  text-align: center;
+}
+
+.subscription-indicator {
+  margin-top: 12px;
+  padding: 6px 12px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.worker-logs-container {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.worker-log-entry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+  font-family: 'Courier New', monospace;
+}
+
+.worker-log-entry:last-child {
+  border-bottom: none;
+}
+
+.worker-log-entry:hover {
+  background: #f5f5f5;
+}
+
+.log-time {
+  color: #666;
+  min-width: 80px;
+}
+
+.log-tick {
+  color: #2196f3;
+  font-weight: 600;
+  min-width: 40px;
+}
+
+.log-message {
+  color: #333;
+  flex: 1;
+  min-width: 150px;
+}
+
+.log-data {
+  color: #666;
+  font-size: 12px;
+  width: 100%;
+  padding-left: 128px;
+  word-break: break-all;
+}
+
+.worker-code-info {
+  margin: 0 0 12px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.worker-code-info code {
+  background: #e8e8e8;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.worker-code-preview {
+  background: #2d2d2d;
+  color: #f8f8f2;
+  padding: 16px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: auto;
+  margin: 0;
+  white-space: pre-wrap;
+}

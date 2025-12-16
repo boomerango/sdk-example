@@ -1,0 +1,146 @@
+.logger {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.logger-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.logger-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.logger-clear-btn {
+  padding: 8px 16px;
+  background: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.logger-clear-btn:hover {
+  background: #cc0000;
+}
+
+.logger-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.logger-empty {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+  font-size: 14px;
+}
+
+.logger-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.logger-entry {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 14px;
+}
+
+.logger-entry--success {
+  border-left: 4px solid #4caf50;
+}
+
+.logger-entry--error {
+  border-left: 4px solid #f44336;
+}
+
+.logger-entry--info {
+  border-left: 4px solid #2196f3;
+}
+
+.logger-entry-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.logger-entry-time {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.logger-entry-method {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #333;
+  font-weight: 600;
+}
+
+.logger-entry-level {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.logger-entry-level--success {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.logger-entry-level--error {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.logger-entry-level--info {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.logger-entry-message {
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.logger-entry-data {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #333;
+  overflow-x: auto;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
