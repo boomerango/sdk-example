@@ -1,0 +1,24 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+build
+
+# Development
+.DS_Store
+*.log
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode
+.idea
+*.sublime-*
+
