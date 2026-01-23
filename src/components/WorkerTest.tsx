@@ -1,22 +1,7 @@
-import { useState, useEffect, useCallback } from 'react'
-import { configure, store } from '@telemetryos/sdk'
-import { name } from '~/telemetry.config.json'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { store, globalClient } from '@telemetryos/sdk'
 import { LogEntry } from '../types'
 import './WorkerTest.css'
-
-// Check if running in TelemetryOS environment
-const urlParams = new URLSearchParams(window.location.search)
-const hasApplicationInstance = urlParams.has('applicationInstance')
-
-let sdkConfigured = false
-if (hasApplicationInstance) {
-  try {
-    configure(name)
-    sdkConfigured = true
-  } catch {
-    sdkConfigured = true
-  }
-}
 
 interface WorkerLogEntry {
   timestamp: string
@@ -34,63 +19,88 @@ export function WorkerTest({ onLog }: WorkerTestProps) {
   const [workerLogs, setWorkerLogs] = useState<WorkerLogEntry[]>([])
   const [latestStatus, setLatestStatus] = useState<WorkerLogEntry | null>(null)
   const [isSubscribed, setIsSubscribed] = useState(false)
+  const [debugInfo, setDebugInfo] = useState<string>('')
 
-  // Handler for worker state updates from store
+  // Use ref to avoid re-subscriptions when onLog changes
+  const onLogRef = useRef(onLog)
+  onLogRef.current = onLog
+
+  // Stable handler that doesn't change
   const handleWorkerState = useCallback((value: string) => {
-    if (!value) return
+    console.log('[WorkerTest] Received worker_state update:', value)
+    if (!value) {
+      console.log('[WorkerTest] Empty value received')
+      return
+    }
     try {
       const logEntry = JSON.parse(value) as WorkerLogEntry
 
       setLatestStatus(logEntry)
       setWorkerLogs((prev) => [logEntry, ...prev].slice(0, 10))
 
-      onLog({
+      onLogRef.current({
         level: 'info',
         method: 'worker.state',
         message: logEntry.message,
         data: logEntry.data,
       })
     } catch (error) {
-      console.error('Failed to parse worker state:', error)
+      console.error('[WorkerTest] Failed to parse worker state:', error, value)
     }
-  }, [onLog])
+  }, []) // No dependencies - uses ref for onLog
 
-  // Subscribe to worker state from store
+  // Subscribe to worker state from store - runs only once
   useEffect(() => {
-    if (!sdkConfigured) {
-      onLog({
+    const client = globalClient()
+    if (!client) {
+      const msg = 'SDK not configured. Run app via "telemetryos serve" command.'
+      console.error('[WorkerTest]', msg)
+      setDebugInfo(msg)
+      onLogRef.current({
         level: 'error',
         method: 'Worker',
-        message: 'SDK not configured. Run app via "telemetryos serve" command.',
+        message: msg,
         data: { hint: 'Missing applicationInstance query parameter' },
       })
       return
     }
 
+    // Log debug info about current client
+    const clientInfo = `applicationInstance: ${client.applicationInstance}, applicationSpecifier: ${client.applicationSpecifier}`
+    console.log('[WorkerTest] SDK client info:', clientInfo)
+    setDebugInfo(clientInfo)
+
     let mounted = true
+    let handlerRef = handleWorkerState
 
     const initSubscription = async () => {
       try {
+        console.log('[WorkerTest] Getting initial worker_state...')
         // Get initial state
         const stateValue = await store().instance.get('worker_state')
+        console.log('[WorkerTest] Initial worker_state:', stateValue)
+
         if (mounted && stateValue) {
           handleWorkerState(stateValue)
         }
 
+        console.log('[WorkerTest] Subscribing to worker_state...')
         // Subscribe to updates
-        await store().instance.subscribe('worker_state', handleWorkerState)
+        const result = await store().instance.subscribe('worker_state', handlerRef)
+        console.log('[WorkerTest] Subscribe result:', result)
 
         if (mounted) {
           setIsSubscribed(true)
-          onLog({
+          onLogRef.current({
             level: 'success',
             method: 'worker.subscribe',
             message: 'Subscribed to background worker updates',
-            data: {},
+            data: { subscribeResult: result },
           })
         }
       } catch (error: any) {
-        onLog({
+        console.error('[WorkerTest] Subscription error:', error)
+        onLogRef.current({
           level: 'error',
           method: 'worker.subscribe',
           message: `Failed to subscribe: ${error.message}`,
@@ -102,10 +112,11 @@ export function WorkerTest({ onLog }: WorkerTestProps) {
     initSubscription()
 
     return () => {
+      console.log('[WorkerTest] Cleaning up subscription')
       mounted = false
-      store().instance.unsubscribe('worker_state', handleWorkerState).catch(console.error)
+      store().instance.unsubscribe('worker_state', handlerRef).catch(console.error)
     }
-  }, [handleWorkerState, onLog])
+  }, [handleWorkerState]) // Only depends on stable handleWorkerState
 
   const formatTime = (isoString: string) => {
     try {
@@ -122,6 +133,13 @@ export function WorkerTest({ onLog }: WorkerTestProps) {
         The background worker is started automatically by TelemetryOS and reports progress via the store.
         The UI subscribes to updates - no manual worker creation needed.
       </p>
+
+      {/* Debug Info */}
+      {debugInfo && (
+        <div className="worker-debug-section" style={{ background: '#f0f0f0', padding: '8px', marginBottom: '16px', fontSize: '12px', fontFamily: 'monospace' }}>
+          <strong>Debug:</strong> {debugInfo}
+        </div>
+      )}
 
       {/* Worker Status */}
       <div className="worker-status-section">

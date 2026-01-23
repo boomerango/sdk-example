@@ -1,6 +1,6 @@
 {
   "name": "example_sdk_app",
-  "version": "0.0.6",
+  "version": "1.0.0",
   "description": "Example SDK application demonstrating TelemetryOS SDK features",
   "type": "module",
   "scripts": {

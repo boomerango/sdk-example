@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { configure, globalClient } from '@telemetryos/sdk'
 import { StoreTest } from '../components/StoreTest'
 import { ApiTest } from '../components/ApiTest'
@@ -39,14 +39,14 @@ export function View() {
   const [showStoreTest, setShowStoreTest] = useState(false)
   const [showWorkerTest, setShowWorkerTest] = useState(false)
 
-  const addLog = (log: Omit<LogEntry, 'id' | 'timestamp'>) => {
+  const addLog = useCallback((log: Omit<LogEntry, 'id' | 'timestamp'>) => {
     const newLog: LogEntry = {
       ...log,
       id: `${Date.now()}-${Math.random()}`,
       timestamp: new Date(),
     }
     setLogs((prevLogs) => [newLog, ...prevLogs])
-  }
+  }, [])
 
   const clearLogs = () => {
     setLogs([])

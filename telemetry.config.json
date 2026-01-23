@@ -1,11 +1,14 @@
 {
   "name": "example_sdk_app",
-  "version": "0.0.6",
+  "version": "1.0.0",
   "description": "Example editor and renderer for TelemetryOS",
   "mountPoints": {
     "render": "/view",
     "settings": "/edit",
     "home": "/"
+  },
+    "backgroundWorkers": {
+    "background": "workers/background.js"
   },
   "useSpaRouting": true
 }

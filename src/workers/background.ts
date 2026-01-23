@@ -1,8 +1,20 @@
-import { configure, store } from '@telemetryos/sdk'
+import { configure, store, globalClient } from '@telemetryos/sdk'
 import { name } from '~/telemetry.config.json'
 
+console.log('[BackgroundWorker] Starting worker...')
+console.log('[BackgroundWorker] Worker URL:', self.location.href)
+
 // Configure SDK for the worker
-configure(name)
+try {
+  configure(name)
+  const client = globalClient()
+  console.log('[BackgroundWorker] SDK configured successfully')
+  console.log('[BackgroundWorker] applicationInstance:', client?.applicationInstance)
+  console.log('[BackgroundWorker] applicationSpecifier:', client?.applicationSpecifier)
+} catch (error) {
+  console.error('[BackgroundWorker] Failed to configure SDK:', error)
+  throw error
+}
 
 // Worker state
 let tickCount = 0
@@ -20,10 +32,17 @@ async function log(message: string, data?: any) {
     isRunning,
   }
 
-  // Write to store - UI subscribes to this key
-  await store().instance.set('worker_state', JSON.stringify(state))
+  console.log(`[BackgroundWorker] Writing to store:`, state)
 
-  console.log(`[Background Worker] ${message}`, data || '')
+  // Write to store - UI subscribes to this key
+  try {
+    await store().instance.set('worker_state', JSON.stringify(state))
+    console.log(`[BackgroundWorker] Store write successful`)
+  } catch (error) {
+    console.error(`[BackgroundWorker] Store write failed:`, error)
+  }
+
+  console.log(`[BackgroundWorker] ${message}`, data || '')
 }
 
 // Main worker loop
