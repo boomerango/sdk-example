@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   accounts,
   users,
@@ -27,11 +27,65 @@ export function ApiTest({ onLog }: ApiTestProps) {
   const [playlistDuration, setPlaylistDuration] = useState('30000')
   const [overrideName, setOverrideName] = useState('emergency-alert')
   const [proxyUrl, setProxyUrl] = useState('https://api.github.com/zen')
-  const [weatherCity, setWeatherCity] = useState('New York')
-  const [weatherUnits, setWeatherUnits] = useState<'imperial' | 'metric'>('imperial')
+  const activeOverrideNameRef = useRef<string | null>(null)
+  const overrideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [weatherCitySearch, setWeatherCitySearch] = useState('New York')
+  const [weatherCityId, setWeatherCityId] = useState('')
+  const [weatherCityLabel, setWeatherCityLabel] = useState('')
   const [forecastDays, setForecastDays] = useState('5')
   const [forecastHours, setForecastHours] = useState('24')
   const [appSpecifier, setAppSpecifier] = useState('')
+
+  const clearActiveOverride = useCallback(async () => {
+    const name = activeOverrideNameRef.current
+    if (!name) {
+      onLog({
+        level: 'error',
+        method: 'overrides().clearOverride',
+        message: 'No active override to clear (set an override first)',
+      })
+      return
+    }
+
+    try {
+      const result = await overrides().clearOverride(name)
+      activeOverrideNameRef.current = null
+      if (overrideTimerRef.current) {
+        clearTimeout(overrideTimerRef.current)
+        overrideTimerRef.current = null
+      }
+      onLog({
+        level: 'success',
+        method: 'overrides().clearOverride',
+        message: `Cleared override via keyboard shortcut`,
+        data: { name, result },
+      })
+    } catch (error: any) {
+      onLog({
+        level: 'error',
+        method: 'overrides().clearOverride',
+        message: `Failed to clear override: ${error.message}`,
+        data: { name, error: error.message },
+      })
+    }
+  }, [onLog])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+
+      const isClearShortcut =
+        (e.key === 'l' && (e.metaKey || e.ctrlKey)) || (e.key === 'q' && !e.metaKey && !e.ctrlKey && !e.altKey)
+
+      if (isClearShortcut) {
+        e.preventDefault()
+        clearActiveOverride()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [clearActiveOverride])
 
   // Accounts API
   const testAccountsGetCurrent = async () => {
@@ -341,7 +395,7 @@ export function ApiTest({ onLog }: ApiTestProps) {
         level: 'error',
         method: 'playlist().setDuration',
         message: `Failed to set duration: ${error.message}`,
-        data: { duration, error: error.message, stack: error.stack },
+        data: { durationMs, error: error.message, stack: error.stack },
       })
       console.error('Playlist setDuration error:', error)
     }
@@ -417,26 +471,65 @@ export function ApiTest({ onLog }: ApiTestProps) {
   }
 
   // Weather API
-  const testWeatherGetConditions = async () => {
-    if (!weatherCity.trim()) {
+  const testWeatherGetCities = async () => {
+    if (!weatherCitySearch.trim()) {
       onLog({
         level: 'error',
-        method: 'weather().getConditions',
-        message: `Please provide a city name`,
+        method: 'weather().getCities',
+        message: `Please provide a city name to search`,
       })
       return
     }
 
     try {
-      const result = await weather().getConditions({
-        city: weatherCity,
-        units: weatherUnits,
+      const result = await weather().getCities({ search: weatherCitySearch })
+      if (result.length > 0) {
+        const city = result[0]
+        setWeatherCityId(String(city.cityId))
+        setWeatherCityLabel(`${city.cityName}, ${city.countryCode}`)
+      }
+      onLog({
+        level: 'success',
+        method: 'weather().getCities',
+        message: `Found ${result.length} cities`,
+        data: { search: weatherCitySearch, result },
       })
+      console.log('Weather getCities result:', result)
+    } catch (error: any) {
+      onLog({
+        level: 'error',
+        method: 'weather().getCities',
+        message: `Failed to search cities: ${error.message}`,
+        data: { search: weatherCitySearch, error: error.message, stack: error.stack },
+      })
+      console.error('Weather getCities error:', error)
+    }
+  }
+
+  const requireCityId = (method: string): number | null => {
+    const cityId = parseInt(weatherCityId)
+    if (!weatherCityId.trim() || isNaN(cityId)) {
+      onLog({
+        level: 'error',
+        method,
+        message: `Please search for a city first to get a cityId`,
+      })
+      return null
+    }
+    return cityId
+  }
+
+  const testWeatherGetConditions = async () => {
+    const cityId = requireCityId('weather().getConditions')
+    if (!cityId) return
+
+    try {
+      const result = await weather().getConditions({ cityId })
       onLog({
         level: 'success',
         method: 'weather().getConditions',
         message: `Retrieved current weather conditions`,
-        data: { city: weatherCity, units: weatherUnits, result },
+        data: { cityId, result },
       })
       console.log('Weather getConditions result:', result)
     } catch (error: any) {
@@ -444,21 +537,15 @@ export function ApiTest({ onLog }: ApiTestProps) {
         level: 'error',
         method: 'weather().getConditions',
         message: `Failed to get weather conditions: ${error.message}`,
-        data: { city: weatherCity, error: error.message, stack: error.stack },
+        data: { cityId, error: error.message, stack: error.stack },
       })
       console.error('Weather getConditions error:', error)
     }
   }
 
   const testWeatherGetDailyForecast = async () => {
-    if (!weatherCity.trim()) {
-      onLog({
-        level: 'error',
-        method: 'weather().getDailyForecast',
-        message: `Please provide a city name`,
-      })
-      return
-    }
+    const cityId = requireCityId('weather().getDailyForecast')
+    if (!cityId) return
 
     const days = parseInt(forecastDays)
     if (isNaN(days) || days <= 0) {
@@ -471,16 +558,12 @@ export function ApiTest({ onLog }: ApiTestProps) {
     }
 
     try {
-      const result = await weather().getDailyForecast({
-        city: weatherCity,
-        units: weatherUnits,
-        days,
-      })
+      const result = await weather().getDailyForecast({ cityId, days })
       onLog({
         level: 'success',
         method: 'weather().getDailyForecast',
         message: `Retrieved ${days}-day weather forecast`,
-        data: { city: weatherCity, units: weatherUnits, days, result },
+        data: { cityId, days, result },
       })
       console.log('Weather getDailyForecast result:', result)
     } catch (error: any) {
@@ -488,21 +571,15 @@ export function ApiTest({ onLog }: ApiTestProps) {
         level: 'error',
         method: 'weather().getDailyForecast',
         message: `Failed to get daily forecast: ${error.message}`,
-        data: { city: weatherCity, days, error: error.message, stack: error.stack },
+        data: { cityId, days, error: error.message, stack: error.stack },
       })
       console.error('Weather getDailyForecast error:', error)
     }
   }
 
   const testWeatherGetHourlyForecast = async () => {
-    if (!weatherCity.trim()) {
-      onLog({
-        level: 'error',
-        method: 'weather().getHourlyForecast',
-        message: `Please provide a city name`,
-      })
-      return
-    }
+    const cityId = requireCityId('weather().getHourlyForecast')
+    if (!cityId) return
 
     const hours = parseInt(forecastHours)
     if (isNaN(hours) || hours <= 0) {
@@ -515,16 +592,12 @@ export function ApiTest({ onLog }: ApiTestProps) {
     }
 
     try {
-      const result = await weather().getHourlyForecast({
-        city: weatherCity,
-        units: weatherUnits,
-        hours,
-      })
+      const result = await weather().getHourlyForecast({ cityId, hours })
       onLog({
         level: 'success',
         method: 'weather().getHourlyForecast',
         message: `Retrieved ${hours}-hour weather forecast`,
-        data: { city: weatherCity, units: weatherUnits, hours, result },
+        data: { cityId, hours, result },
       })
       console.log('Weather getHourlyForecast result:', result)
     } catch (error: any) {
@@ -532,9 +605,33 @@ export function ApiTest({ onLog }: ApiTestProps) {
         level: 'error',
         method: 'weather().getHourlyForecast',
         message: `Failed to get hourly forecast: ${error.message}`,
-        data: { city: weatherCity, hours, error: error.message, stack: error.stack },
+        data: { cityId, hours, error: error.message, stack: error.stack },
       })
       console.error('Weather getHourlyForecast error:', error)
+    }
+  }
+
+  const testWeatherGetAlerts = async () => {
+    const cityId = requireCityId('weather().getAlerts')
+    if (!cityId) return
+
+    try {
+      const result = await weather().getAlerts({ cityId })
+      onLog({
+        level: 'success',
+        method: 'weather().getAlerts',
+        message: `Retrieved ${result.alerts.length} weather alerts`,
+        data: { cityId, result },
+      })
+      console.log('Weather getAlerts result:', result)
+    } catch (error: any) {
+      onLog({
+        level: 'error',
+        method: 'weather().getAlerts',
+        message: `Failed to get weather alerts: ${error.message}`,
+        data: { cityId, error: error.message, stack: error.stack },
+      })
+      console.error('Weather getAlerts error:', error)
     }
   }
 
@@ -551,10 +648,40 @@ export function ApiTest({ onLog }: ApiTestProps) {
 
     try {
       const result = await overrides().setOverride(overrideName)
+      activeOverrideNameRef.current = overrideName
+
+      // Auto-clear the override after 30 seconds
+      if (overrideTimerRef.current) {
+        clearTimeout(overrideTimerRef.current)
+      }
+      const nameToAutoClear = overrideName
+      overrideTimerRef.current = setTimeout(async () => {
+        overrideTimerRef.current = null
+        if (activeOverrideNameRef.current === nameToAutoClear) {
+          try {
+            await overrides().clearOverride(nameToAutoClear)
+            activeOverrideNameRef.current = null
+            onLog({
+              level: 'info',
+              method: 'overrides().clearOverride',
+              message: `Auto-cleared override after 30s`,
+              data: { name: nameToAutoClear },
+            })
+          } catch (error: any) {
+            onLog({
+              level: 'error',
+              method: 'overrides().clearOverride',
+              message: `Failed to auto-clear override: ${error.message}`,
+              data: { name: nameToAutoClear, error: error.message },
+            })
+          }
+        }
+      }, 30_000)
+
       onLog({
         level: 'success',
         method: 'overrides().setOverride',
-        message: `Set content override`,
+        message: `Set content override (will auto-clear in 30s)`,
         data: { name: overrideName, result },
       })
       console.log('Overrides setOverride result:', result)
@@ -581,6 +708,11 @@ export function ApiTest({ onLog }: ApiTestProps) {
 
     try {
       const result = await overrides().clearOverride(overrideName)
+      if (overrideTimerRef.current) {
+        clearTimeout(overrideTimerRef.current)
+        overrideTimerRef.current = null
+      }
+      activeOverrideNameRef.current = null
       onLog({
         level: 'success',
         method: 'overrides().clearOverride',
@@ -647,6 +779,27 @@ export function ApiTest({ onLog }: ApiTestProps) {
         data: { error: error.message, stack: error.stack },
       })
       console.error('Environment subscribeColorScheme error:', error)
+    }
+  }
+
+  const testEnvironmentUnsubscribeColorScheme = async () => {
+    try {
+      const result = await environment().unsubscribeColorScheme()
+      onLog({
+        level: 'success',
+        method: 'environment().unsubscribeColorScheme',
+        message: `Unsubscribed from color scheme changes`,
+        data: { success: result },
+      })
+      console.log('Environment unsubscribeColorScheme result:', result)
+    } catch (error: any) {
+      onLog({
+        level: 'error',
+        method: 'environment().unsubscribeColorScheme',
+        message: `Failed to unsubscribe from color scheme: ${error.message}`,
+        data: { error: error.message, stack: error.stack },
+      })
+      console.error('Environment unsubscribeColorScheme error:', error)
     }
   }
 
@@ -867,33 +1020,45 @@ export function ApiTest({ onLog }: ApiTestProps) {
       {/* Weather API */}
       <div className="api-test-section">
         <h3>Weather API</h3>
-        <p className="api-test-info">Access weather conditions and forecasts</p>
+        <p className="api-test-info">Search for a city first to get a cityId, then use it for conditions, forecasts, and alerts</p>
         <div className="api-test-input-group">
           <label>
-            City:
+            City Search:
             <input
               type="text"
-              value={weatherCity}
-              onChange={(e) => setWeatherCity(e.target.value)}
-              placeholder="Enter city name"
+              value={weatherCitySearch}
+              onChange={(e) => setWeatherCitySearch(e.target.value)}
+              placeholder="Enter city name (e.g., New York)"
               className="api-test-input"
             />
           </label>
+        </div>
+        <div className="api-test-buttons">
+          <button onClick={testWeatherGetCities} className="btn btn-primary">
+            Search Cities
+          </button>
+        </div>
+        <div className="api-test-input-group">
           <label>
-            Units:
-            <select
-              value={weatherUnits}
-              onChange={(e) => setWeatherUnits(e.target.value as 'imperial' | 'metric')}
+            City ID:
+            <input
+              type="text"
+              value={weatherCityId}
+              onChange={(e) => setWeatherCityId(e.target.value)}
+              placeholder="Auto-filled from search, or enter manually"
               className="api-test-input"
-            >
-              <option value="imperial">Imperial (°F, mph)</option>
-              <option value="metric">Metric (°C, km/h)</option>
-            </select>
+            />
           </label>
+          {weatherCityLabel && (
+            <span className="api-test-info">{weatherCityLabel}</span>
+          )}
         </div>
         <div className="api-test-buttons">
           <button onClick={testWeatherGetConditions} className="btn btn-primary">
             Get Current Conditions
+          </button>
+          <button onClick={testWeatherGetAlerts} className="btn btn-secondary">
+            Get Alerts
           </button>
         </div>
         <div className="api-test-input-group">
@@ -939,7 +1104,7 @@ export function ApiTest({ onLog }: ApiTestProps) {
       {/* Overrides API */}
       <div className="api-test-section">
         <h3>Overrides API</h3>
-        <p className="api-test-info">Manage content overrides</p>
+        <p className="api-test-info">Manage content overrides (Clear: Ctrl/Cmd+L or Q)</p>
         <div className="api-test-input-group">
           <label>
             Override Name:
@@ -972,6 +1137,9 @@ export function ApiTest({ onLog }: ApiTestProps) {
           </button>
           <button onClick={testEnvironmentSubscribeColorScheme} className="btn btn-secondary">
             Subscribe to Color Scheme
+          </button>
+          <button onClick={testEnvironmentUnsubscribeColorScheme} className="btn btn-secondary">
+            Unsubscribe from Color Scheme
           </button>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { configure } from '@telemetryos/sdk'
+import { configure, users } from '@telemetryos/sdk'
 import { name } from '~/telemetry.config.json'
 import {
   sendStoreValue,
@@ -43,6 +43,8 @@ export function Edit() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [userLoading, setUserLoading] = useState(false)
 
   // Subscription callback
   const handleStoreUpdate = useCallback((newValue: any) => {
@@ -172,6 +174,26 @@ export function Edit() {
     loadAndSubscribe()
   }
 
+  const handleGetCurrentUser = async () => {
+    if (!sdkConfigured) {
+      setError('SDK not configured')
+      return
+    }
+
+    setUserLoading(true)
+    setError(null)
+
+    try {
+      const result = await users().getCurrent()
+      setCurrentUser(result)
+    } catch (err: any) {
+      console.error('Failed to get current user:', err)
+      setError(err.message || 'Failed to get current user')
+    } finally {
+      setUserLoading(false)
+    }
+  }
+
   return (
     <div className="edit">
       <div className="edit-header">
@@ -288,6 +310,19 @@ export function Edit() {
               </button>
             </div>
           </form>
+        </div>
+
+        {/* Current User */}
+        <div className="edit-section">
+          <h2>Current User</h2>
+          <button onClick={handleGetCurrentUser} className="btn-submit" disabled={userLoading}>
+            {userLoading ? 'Loading...' : 'Get Current User'}
+          </button>
+          {currentUser && (
+            <div className="current-value-display" style={{ marginTop: '12px' }}>
+              <pre>{JSON.stringify(currentUser, null, 2)}</pre>
+            </div>
+          )}
         </div>
 
         {/* Scope Info */}
