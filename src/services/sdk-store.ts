@@ -166,7 +166,7 @@ export async function getSharedStoreValue({ namespace, key }: { namespace: strin
 
   try {
     console.log(`SDK: call store().shared('${namespace}').get('${key}')`)
-    const value = await sdkStore().shared(namespace).get(key)
+    const value:string = await sdkStore().shared(namespace).get(key)
     const parsedValue = parseValue(value || '')
     console.log(`SDK: finished retrieving "${key}" from shared("${namespace}") store =`, parsedValue)
     return parsedValue

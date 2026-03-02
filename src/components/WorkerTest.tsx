@@ -77,7 +77,7 @@ export function WorkerTest({ onLog }: WorkerTestProps) {
       try {
         console.log('[WorkerTest] Getting initial worker_state...')
         // Get initial state
-        const stateValue = await store().instance.get('worker_state')
+        const stateValue:string = await store().instance.get('worker_state')
         console.log('[WorkerTest] Initial worker_state:', stateValue)
 
         if (mounted && stateValue) {
