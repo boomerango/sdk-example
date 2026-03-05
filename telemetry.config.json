@@ -5,7 +5,8 @@
   "mountPoints": {
     "render": "/view",
     "settings": "/edit",
-    "home": "/"
+    "home": "/",
+    "web": "/example_sdk_app"
   },
     "backgroundWorkers": {
     "background": "workers/background.js"

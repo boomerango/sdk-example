@@ -1,0 +1,177 @@
+.web {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  padding: 20px;
+}
+
+.web-header {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.web-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.web-subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 16px;
+}
+
+.web-subtitle code {
+  background: #f0f0f0;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+.web-content {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 50vw);
+  gap: 20px;
+  align-items: start;
+}
+
+.web-stores {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.web-section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.web-section h2 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.web-section-info {
+  margin: 0 0 12px 0;
+  color: #888;
+  font-size: 13px;
+}
+
+.web-current-value {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #555;
+}
+
+.web-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.web-input {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.web-input:focus {
+  border-color: #11998e;
+}
+
+.web-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.web-notice {
+  border-left: 4px solid #11998e;
+}
+
+.web-notice ul {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+  color: #555;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.web-logger {
+  position: sticky;
+  top: 20px;
+  height: calc(100vh - 40px);
+  min-height: 500px;
+  max-width: 50vw;
+}
+
+/* Button styles (mirrors View.css) */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+@media (max-width: 1200px) {
+  .web-content {
+    grid-template-columns: 1fr;
+  }
+
+  .web-logger {
+    position: static;
+    height: 600px;
+  }
+}

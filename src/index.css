@@ -41,6 +41,11 @@ code {
   background: #555;
 }
 
+/* Web mount point: reset font size to standard browser default (overrides device scaling) */
+html:has(.web) {
+  font-size: 16px;
+}
+
 /* Utility classes */
 .text-center {
   text-align: center;
