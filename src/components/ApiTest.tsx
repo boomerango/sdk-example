@@ -370,6 +370,27 @@ export function ApiTest({ onLog }: ApiTestProps) {
     }
   }
 
+  const testPlaylistGetDuration = async () => {
+    try {
+      const result = await playlist().getDuration()
+      onLog({
+        level: 'success',
+        method: 'playlist().getDuration',
+        message: `Retrieved playlist page duration`,
+        data: { result },
+      })
+      console.log('Playlist getDuration result:', result)
+    } catch (error: any) {
+      onLog({
+        level: 'error',
+        method: 'playlist().getDuration',
+        message: `Failed to get duration: ${error.message}`,
+        data: { error: error.message, stack: error.stack },
+      })
+      console.error('Playlist getDuration error:', error)
+    }
+  }
+
   const testPlaylistSetDuration = async () => {
     const durationMs = parseInt(playlistDuration)
     if (isNaN(durationMs) || durationMs <= 0) {
@@ -961,6 +982,9 @@ export function ApiTest({ onLog }: ApiTestProps) {
           </button>
           <button onClick={testPlaylistPreviousPage} className="btn btn-secondary">
             Previous Page
+          </button>
+          <button onClick={testPlaylistGetDuration} className="btn btn-secondary">
+            Get Duration
           </button>
         </div>
         <div className="api-test-input-group">

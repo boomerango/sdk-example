@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import { View } from './views/View'
 import { Edit } from './views/Edit'
+import { Web } from './views/Web'
 
 const router = createBrowserRouter([
   {
@@ -10,6 +11,10 @@ const router = createBrowserRouter([
   {
     path: '/edit',
     Component: Edit,
+  },
+  {
+    path: '/example_sdk_app/*',
+    Component: Web,
   },
 ])
 
