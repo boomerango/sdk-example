@@ -77,7 +77,7 @@ export function View() {
   return (
     <div className="view">
       <div className="view-header">
-        <h1>TelemetryOS SDK Example - View</h1>
+        <h1>TelemetryOS SDK Example - View 2.0</h1>
         <p className="view-subtitle">
           Testing SDK functionality in the render/view mount point
         </p>
