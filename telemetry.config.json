@@ -1,6 +1,6 @@
 {
   "name": "example_sdk_app",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Example editor and renderer for TelemetryOS",
   "mountPoints": {
     "render": "/view",
