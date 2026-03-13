@@ -76,7 +76,7 @@
 }
 
 .logger-entry--info {
-  border-left: 4px solid #2196f3;
+  border-left: 4px solid #d98c00;
 }
 
 .logger-entry-header {
@@ -120,8 +120,8 @@
 }
 
 .logger-entry-level--info {
-  background: #e3f2fd;
-  color: #1565c0;
+  background: rgba(217, 140, 0, 0.12);
+  color: #8b5a00;
 }
 
 .logger-entry-message {
