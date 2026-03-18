@@ -54,7 +54,7 @@
 .test-toggles button {
   padding: 10px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;

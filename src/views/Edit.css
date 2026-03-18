@@ -137,7 +137,7 @@
   background: #6c757d;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 14px;
   cursor: pointer;
   transition: background 0.2s;
@@ -232,7 +232,7 @@
   background: linear-gradient(135deg, #d98c00 0%, #e89500 100%);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
@@ -255,7 +255,7 @@
   background: transparent;
   color: #dc3545;
   border: 1px solid #dc3545;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
