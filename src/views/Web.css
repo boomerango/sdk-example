@@ -1,6 +1,6 @@
 .web {
   min-height: 100vh;
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, #0e0648 0%, #281b86 100%);
   padding: 20px;
 }
 
@@ -17,7 +17,7 @@
   font-size: 32px;
   font-weight: 700;
   color: #333;
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, #d98c00 0%, #e89500 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -97,7 +97,7 @@
 }
 
 .web-input:focus {
-  border-color: #11998e;
+  border-color: #d98c00;
 }
 
 .web-buttons {
@@ -107,7 +107,7 @@
 }
 
 .web-notice {
-  border-left: 4px solid #11998e;
+  border-left: 4px solid #d98c00;
 }
 
 .web-notice ul {
@@ -138,13 +138,13 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, #d98c00 0%, #e89500 100%);
   color: white;
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
+  box-shadow: 0 4px 12px rgba(217, 140, 0, 0.4);
 }
 
 .btn-secondary {

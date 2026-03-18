@@ -72,7 +72,7 @@
 
 .store-test-input:focus {
   outline: none;
-  border-color: #2196f3;
+  border-color: #d98c00;
 }
 
 .store-test-buttons {
@@ -110,12 +110,12 @@
 }
 
 .btn-secondary {
-  background: #2196f3;
+  background: #d98c00;
   color: white;
 }
 
 .btn-secondary:hover {
-  background: #0b7dda;
+  background: #b87800;
 }
 
 .btn-info {
