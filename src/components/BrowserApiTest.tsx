@@ -387,6 +387,63 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
     onLog({ level: 'info', method: 'navigator.mediaDevices.getUserMedia', message: 'Camera stream closed' })
   }
 
+  // --- User-gesture requests ---
+
+  const requestUsbDevice = async () => {
+    if (!('usb' in navigator)) return
+    try {
+      const device = await (navigator as any).usb.requestDevice({ filters: [] })
+      onLog({
+        level: 'success',
+        method: 'navigator.usb.requestDevice',
+        message: `USB access granted: ${device.productName || 'unknown device'}`,
+        data: { vendorId: device.vendorId, productId: device.productId, productName: device.productName, manufacturerName: device.manufacturerName },
+      })
+      await testUsbDevices()
+    } catch (error: any) {
+      if (error.name === 'NotFoundError') {
+        onLog({ level: 'warning', method: 'navigator.usb.requestDevice', message: 'No device selected' })
+      } else {
+        onLog({ level: 'error', method: 'navigator.usb.requestDevice', message: error.message })
+      }
+    }
+  }
+
+  const requestSerialPort = async () => {
+    if (!('serial' in navigator)) return
+    try {
+      await (navigator as any).serial.requestPort()
+      onLog({ level: 'success', method: 'navigator.serial.requestPort', message: 'Serial port access granted' })
+      await testSerialPorts()
+    } catch (error: any) {
+      if (error.name === 'NotFoundError') {
+        onLog({ level: 'warning', method: 'navigator.serial.requestPort', message: 'No port selected' })
+      } else {
+        onLog({ level: 'error', method: 'navigator.serial.requestPort', message: error.message })
+      }
+    }
+  }
+
+  const requestBluetoothDevice = async () => {
+    if (!('bluetooth' in navigator)) return
+    try {
+      const device = await (navigator as any).bluetooth.requestDevice({ acceptAllDevices: true })
+      onLog({
+        level: 'success',
+        method: 'navigator.bluetooth.requestDevice',
+        message: `Bluetooth access granted: ${device.name || 'unknown device'}`,
+        data: { name: device.name, id: device.id },
+      })
+      await testBluetoothDevices()
+    } catch (error: any) {
+      if (error.name === 'NotFoundError') {
+        onLog({ level: 'warning', method: 'navigator.bluetooth.requestDevice', message: 'No device selected' })
+      } else {
+        onLog({ level: 'error', method: 'navigator.bluetooth.requestDevice', message: error.message })
+      }
+    }
+  }
+
   // --- Re-run all auto tests ---
 
   const runAllAutoTests = () => {
@@ -497,6 +554,11 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
             </tr>
           </tbody>
         </table>
+        <div className="browser-api-buttons">
+          <button onClick={requestUsbDevice} disabled={results.usbCheck.status !== 'AVAILABLE'}>
+            Request USB Device
+          </button>
+        </div>
       </div>
 
       {/* WebSerial */}
@@ -528,6 +590,11 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
             </tr>
           </tbody>
         </table>
+        <div className="browser-api-buttons">
+          <button onClick={requestSerialPort} disabled={results.serialCheck.status !== 'AVAILABLE'}>
+            Request Serial Port
+          </button>
+        </div>
         {serialPanels.length > 0 && (
           <div className="serial-panels">
             {serialPanels.map((panel) => (
@@ -609,6 +676,11 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
             </tr>
           </tbody>
         </table>
+        <div className="browser-api-buttons">
+          <button onClick={requestBluetoothDevice} disabled={results.bluetoothCheck.status !== 'AVAILABLE'}>
+            Request Bluetooth Device
+          </button>
+        </div>
       </div>
 
       {/* Camera */}
