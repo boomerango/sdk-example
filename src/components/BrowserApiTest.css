@@ -163,3 +163,159 @@
   background: #f8d7da;
   color: #721c24;
 }
+
+/* Camera overlay */
+.camera-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.camera-overlay-card {
+  background: #111;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-width: 640px;
+  width: 90%;
+}
+
+.camera-preview-video {
+  width: 100%;
+  display: block;
+}
+
+.camera-close-btn {
+  margin: 8px;
+  padding: 8px 16px;
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.camera-close-btn:hover {
+  background: #b02a37;
+}
+
+/* Serial panels */
+.serial-panels {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.serial-panel {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.serial-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #efefef;
+}
+
+.serial-panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  flex-shrink: 0;
+}
+
+.serial-panel-header select {
+  padding: 3px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+  background: #fff;
+}
+
+.serial-panel-header button {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  background: #007bff;
+  color: #fff;
+}
+
+.serial-panel-header button:hover {
+  background: #0056b3;
+}
+
+.serial-terminal {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 8px 10px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.serial-terminal-empty {
+  color: #666;
+  font-style: italic;
+}
+
+.serial-send-row {
+  display: flex;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #f5f5f5;
+  border-top: 1px solid #eee;
+}
+
+.serial-send-row input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.serial-send-row button {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  background: #28a745;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.serial-send-row button:hover {
+  background: #1e7e34;
+}
+
+/* Live hardware events */
+.event-usb-connect {
+  color: #155724;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.event-usb-disconnect {
+  color: #721c24;
+  font-weight: 600;
+  font-size: 12px;
+}

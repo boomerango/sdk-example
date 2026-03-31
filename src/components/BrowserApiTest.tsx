@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { LogEntry } from '../types'
 import './BrowserApiTest.css'
 
@@ -35,8 +35,22 @@ interface BrowserApiResults {
   cameraStream: ApiTestResult
 }
 
-const PENDING: ApiTestResult = { status: 'PENDING', detail: 'Not tested yet' }
+interface HardwareEvent {
+  id: string
+  timestamp: Date
+  type: 'usb-connect' | 'usb-disconnect'
+  name: string
+  detail: string
+}
 
+interface SerialPanel {
+  index: number
+  baudRate: number
+  isOpen: boolean
+  rxLines: string[]
+}
+
+const PENDING: ApiTestResult = { status: 'PENDING', detail: 'Not tested yet' }
 const POLICY_FEATURES_TO_CHECK = ['usb', 'serial', 'bluetooth', 'camera', 'microphone']
 
 function getPlatform(): string {
@@ -55,6 +69,10 @@ function getPermissionsPolicyFeatures(): string[] {
   } catch {
     return []
   }
+}
+
+function formatTime(date: Date): string {
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`
 }
 
 function StatusBadge({ result }: { result: ApiTestResult }) {
@@ -76,6 +94,13 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
     cameraStream: PENDING,
   })
   const [policyFeatures, setPolicyFeatures] = useState<string[]>([])
+  const [liveStream, setLiveStream] = useState<MediaStream | null>(null)
+  const [hardwareEvents, setHardwareEvents] = useState<HardwareEvent[]>([])
+  const [serialPanels, setSerialPanels] = useState<SerialPanel[]>([])
+  const [serialSendInputs, setSerialSendInputs] = useState<Record<number, string>>({})
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const serialPortsRef = useRef<any[]>([])
+  const readerRefsRef = useRef<ReadableStreamDefaultReader<any>[]>([])
   const platform = getPlatform()
 
   // --- WebUSB ---
@@ -102,7 +127,7 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
         level: 'success',
         method: 'navigator.usb.getDevices',
         message: `${devices.length} pre-paired USB device(s) (no prompt)`,
-        data: { count: devices.length, devices: devices.map((d) => ({ name: d.productName, vendor: d.vendorId })) },
+        data: { count: devices.length, devices: devices.map((d) => ({ name: d.productName, vendor: d.vendorId, product: d.productId })) },
       })
     } catch (error: any) {
       setResults((prev) => ({ ...prev, usbDevices: { status: 'ERROR', detail: error.message } }))
@@ -134,6 +159,8 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
     }
     try {
       const ports: any[] = await (navigator as any).serial.getPorts()
+      serialPortsRef.current = ports
+      setSerialPanels(ports.map((_, i) => ({ index: i, baudRate: 9600, isOpen: false, rxLines: [] })))
       setResults((prev) => ({ ...prev, serialPorts: { status: 'AVAILABLE', detail: `${ports.length} permitted port(s)` } }))
       onLog({
         level: 'success',
@@ -145,6 +172,95 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
       setResults((prev) => ({ ...prev, serialPorts: { status: 'ERROR', detail: error.message } }))
       onLog({ level: 'error', method: 'navigator.serial.getPorts', message: error.message })
     }
+  }
+
+  const openSerialPort = async (index: number) => {
+    const port = serialPortsRef.current[index]
+    if (!port) return
+    const panel = serialPanels.find((p) => p.index === index)
+    const baudRate = panel?.baudRate ?? 9600
+    try {
+      await port.open({ baudRate })
+      setSerialPanels((prev) => prev.map((p) => (p.index === index ? { ...p, isOpen: true } : p)))
+      onLog({ level: 'success', method: 'serial.open', message: `Port ${index + 1} opened at ${baudRate} baud` })
+
+      const reader = port.readable.getReader()
+      readerRefsRef.current[index] = reader
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      const readLoop = async () => {
+        try {
+          while (true) {
+            const { value, done } = await reader.read()
+            if (done) break
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            buffer = lines.pop() ?? ''
+            if (lines.length > 0) {
+              setSerialPanels((prev) =>
+                prev.map((p) => {
+                  if (p.index !== index) return p
+                  return { ...p, rxLines: [...p.rxLines, ...lines].slice(-200) }
+                }),
+              )
+              lines.forEach((line) => onLog({ level: 'info', method: `serial[${index + 1}] rx`, message: line }))
+            }
+          }
+        } catch {
+          // reader cancelled or port closed — normal shutdown
+        }
+      }
+      readLoop()
+    } catch (error: any) {
+      onLog({ level: 'error', method: 'serial.open', message: `Port ${index + 1}: ${error.message}` })
+    }
+  }
+
+  const closeSerialPort = async (index: number) => {
+    const reader = readerRefsRef.current[index]
+    if (reader) {
+      try {
+        await reader.cancel()
+      } catch {
+        // ignore
+      }
+      readerRefsRef.current[index] = undefined as any
+    }
+    const port = serialPortsRef.current[index]
+    if (port) {
+      try {
+        await port.close()
+      } catch {
+        // ignore
+      }
+    }
+    setSerialPanels((prev) => prev.map((p) => (p.index === index ? { ...p, isOpen: false } : p)))
+    onLog({ level: 'warning', method: 'serial.close', message: `Port ${index + 1} closed` })
+  }
+
+  const sendSerial = async (index: number) => {
+    const port = serialPortsRef.current[index]
+    if (!port) return
+    const text = (serialSendInputs[index] ?? '').trim()
+    if (!text) return
+    try {
+      const writer = port.writable.getWriter()
+      await writer.write(new TextEncoder().encode(text + '\n'))
+      writer.releaseLock()
+      onLog({ level: 'info', method: `serial[${index + 1}] tx`, message: text })
+      setSerialSendInputs((prev) => ({ ...prev, [index]: '' }))
+    } catch (error: any) {
+      onLog({ level: 'error', method: 'serial.write', message: `Port ${index + 1}: ${error.message}` })
+    }
+  }
+
+  const updateSerialBaudRate = (index: number, baudRate: number) => {
+    setSerialPanels((prev) => prev.map((p) => (p.index === index ? { ...p, baudRate } : p)))
+  }
+
+  const updateSerialSendInput = (index: number, value: string) => {
+    setSerialSendInputs((prev) => ({ ...prev, [index]: value }))
   }
 
   // --- WebBluetooth ---
@@ -185,6 +301,11 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
   const testBluetoothDevices = async () => {
     if (!('bluetooth' in navigator)) {
       setResults((prev) => ({ ...prev, bluetoothDevices: { status: 'UNAVAILABLE', detail: 'navigator.bluetooth not present' } }))
+      return
+    }
+    if (typeof (navigator as any).bluetooth.getDevices !== 'function') {
+      setResults((prev) => ({ ...prev, bluetoothDevices: { status: 'UNAVAILABLE', detail: 'getDevices() not supported in this build' } }))
+      onLog({ level: 'warning', method: 'navigator.bluetooth.getDevices', message: 'getDevices() is not a function in this browser/Electron build' })
       return
     }
     try {
@@ -235,16 +356,16 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
     }
   }
 
-  const testCameraStream = async () => {
+  const openCameraPreview = async () => {
     if (!('mediaDevices' in navigator)) {
       setResults((prev) => ({ ...prev, cameraStream: { status: 'UNAVAILABLE', detail: 'navigator.mediaDevices not present' } }))
       return
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-      stream.getTracks().forEach((t) => t.stop())
-      setResults((prev) => ({ ...prev, cameraStream: { status: 'GRANTED', detail: 'Stream acquired and released' } }))
-      onLog({ level: 'success', method: 'navigator.mediaDevices.getUserMedia', message: 'Camera access granted — stream released immediately' })
+      setLiveStream(stream)
+      setResults((prev) => ({ ...prev, cameraStream: { status: 'GRANTED', detail: 'Stream active — preview open' } }))
+      onLog({ level: 'success', method: 'navigator.mediaDevices.getUserMedia', message: 'Camera stream open' })
     } catch (error: any) {
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
         setResults((prev) => ({ ...prev, cameraStream: { status: 'PERMISSION_DENIED', detail: 'Permission denied' } }))
@@ -257,6 +378,13 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
         onLog({ level: 'error', method: 'navigator.mediaDevices.getUserMedia', message: error.message, data: { name: error.name } })
       }
     }
+  }
+
+  const closeCameraPreview = () => {
+    liveStream?.getTracks().forEach((t) => t.stop())
+    setLiveStream(null)
+    setResults((prev) => ({ ...prev, cameraStream: { status: 'AVAILABLE', detail: 'Stream closed' } }))
+    onLog({ level: 'info', method: 'navigator.mediaDevices.getUserMedia', message: 'Camera stream closed' })
   }
 
   // --- Re-run all auto tests ---
@@ -274,11 +402,53 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
     setPolicyFeatures(getPermissionsPolicyFeatures())
   }
 
+  // --- Effects ---
+
   function mountEffect() {
     runAllAutoTests()
   }
-
   useEffect(mountEffect, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function usbEventsEffect() {
+    if (!('usb' in navigator)) return
+    const usb = (navigator as any).usb
+    const onConnect = (e: any) => {
+      const d = e.device
+      const name = d.productName || `Device ${d.vendorId.toString(16)}:${d.productId.toString(16)}`
+      const detail = `VID:${d.vendorId.toString(16).padStart(4, '0')} PID:${d.productId.toString(16).padStart(4, '0')} • ${d.manufacturerName || 'unknown'}`
+      setHardwareEvents((prev) => [
+        { id: String(Date.now()), timestamp: new Date(), type: 'usb-connect', name, detail },
+        ...prev.slice(0, 49),
+      ])
+      onLog({
+        level: 'success',
+        method: 'navigator.usb [connect]',
+        message: `USB connected: ${name}`,
+        data: { vendorId: d.vendorId, productId: d.productId, manufacturerName: d.manufacturerName, serialNumber: d.serialNumber },
+      })
+    }
+    const onDisconnect = (e: any) => {
+      const d = e.device
+      const name = d.productName || `Device ${d.vendorId.toString(16)}:${d.productId.toString(16)}`
+      setHardwareEvents((prev) => [
+        { id: String(Date.now()), timestamp: new Date(), type: 'usb-disconnect', name, detail: '' },
+        ...prev.slice(0, 49),
+      ])
+      onLog({ level: 'warning', method: 'navigator.usb [disconnect]', message: `USB disconnected: ${name}` })
+    }
+    usb.addEventListener('connect', onConnect)
+    usb.addEventListener('disconnect', onDisconnect)
+    return () => {
+      usb.removeEventListener('connect', onConnect)
+      usb.removeEventListener('disconnect', onDisconnect)
+    }
+  }
+  useEffect(usbEventsEffect, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function cameraPreviewEffect() {
+    if (videoRef.current) videoRef.current.srcObject = liveStream
+  }
+  useEffect(cameraPreviewEffect, [liveStream])
 
   return (
     <div className="browser-api-test">
@@ -288,6 +458,15 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
         Connect/requestDevice operations require a user gesture and are not tested automatically.
       </p>
       <div className="browser-api-platform">Platform: {platform}</div>
+
+      {liveStream && (
+        <div className="camera-overlay">
+          <div className="camera-overlay-card">
+            <video ref={videoRef} autoPlay playsInline className="camera-preview-video" />
+            <button className="camera-close-btn" onClick={closeCameraPreview}>✕ Close Stream</button>
+          </div>
+        </div>
+      )}
 
       {/* WebUSB */}
       <div className="browser-api-section">
@@ -349,6 +528,51 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
             </tr>
           </tbody>
         </table>
+        {serialPanels.length > 0 && (
+          <div className="serial-panels">
+            {serialPanels.map((panel) => (
+              <div key={panel.index} className="serial-panel">
+                <div className="serial-panel-header">
+                  <span className="serial-panel-title">Port {panel.index + 1}</span>
+                  <select
+                    value={panel.baudRate}
+                    disabled={panel.isOpen}
+                    onChange={(e) => updateSerialBaudRate(panel.index, Number(e.target.value))}
+                  >
+                    {[9600, 19200, 38400, 57600, 115200].map((b) => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </select>
+                  {panel.isOpen ? (
+                    <button onClick={() => closeSerialPort(panel.index)}>Close</button>
+                  ) : (
+                    <button onClick={() => openSerialPort(panel.index)}>Open</button>
+                  )}
+                </div>
+                {panel.isOpen && (
+                  <>
+                    <div className="serial-terminal">
+                      {panel.rxLines.length === 0 ? (
+                        <span className="serial-terminal-empty">Waiting for data…</span>
+                      ) : (
+                        panel.rxLines.map((line, i) => <div key={i}>{line}</div>)
+                      )}
+                    </div>
+                    <div className="serial-send-row">
+                      <input
+                        value={serialSendInputs[panel.index] ?? ''}
+                        placeholder="send data…"
+                        onChange={(e) => updateSerialSendInput(panel.index, e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') sendSerial(panel.index) }}
+                      />
+                      <button onClick={() => sendSerial(panel.index)}>Send</button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* WebBluetooth */}
@@ -417,8 +641,46 @@ export function BrowserApiTest({ onLog }: BrowserApiTestProps) {
           </tbody>
         </table>
         <div className="browser-api-buttons">
-          <button onClick={testCameraStream}>Test Camera Stream</button>
+          {liveStream ? (
+            <button onClick={closeCameraPreview}>Close Camera</button>
+          ) : (
+            <button onClick={openCameraPreview}>Open Camera Preview</button>
+          )}
         </div>
+      </div>
+
+      {/* Live Hardware Events */}
+      <div className="browser-api-section">
+        <h3>Live Hardware Events</h3>
+        <p className="browser-api-note">USB connect/disconnect events since page load.</p>
+        {hardwareEvents.length === 0 ? (
+          <p className="browser-api-note">No events yet — plug or unplug a USB device.</p>
+        ) : (
+          <table className="browser-api-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Event</th>
+                <th>Device</th>
+                <th>Detail</th>
+              </tr>
+            </thead>
+            <tbody>
+              {hardwareEvents.map((evt) => (
+                <tr key={evt.id}>
+                  <td className="browser-api-note">{formatTime(evt.timestamp)}</td>
+                  <td>
+                    <span className={evt.type === 'usb-connect' ? 'event-usb-connect' : 'event-usb-disconnect'}>
+                      {evt.type === 'usb-connect' ? '⬆ connected' : '⬇ disconnected'}
+                    </span>
+                  </td>
+                  <td>{evt.name}</td>
+                  <td className="browser-api-note">{evt.detail}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Permissions Policy */}
