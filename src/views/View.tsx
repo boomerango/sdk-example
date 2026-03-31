@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { configure, globalClient } from '@telemetryos/sdk'
 import { StoreTest } from '../components/StoreTest'
 import { ApiTest } from '../components/ApiTest'
+import { BrowserApiTest } from '../components/BrowserApiTest'
 import { WorkerTest } from '../components/WorkerTest'
 import { Logger } from '../components/Logger'
 import { LogEntry } from '../types'
@@ -95,6 +96,7 @@ export function View() {
           </div>
           {showStoreTest && <StoreTest onLog={addLog} />}
           <ApiTest onLog={addLog} />
+          <BrowserApiTest onLog={addLog} />
           {showWorkerTest && <WorkerTest onLog={addLog} />}
         </div>
         <div className="view-logger">

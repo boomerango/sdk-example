@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { configure, globalClient } from '@telemetryos/sdk'
 import { name } from '~/telemetry.config.json'
 import { Logger } from '../components/Logger'
+import { BrowserApiTest } from '../components/BrowserApiTest'
 import { LogEntry } from '../types'
 import {
   sendStoreValue,
@@ -195,6 +196,12 @@ export function Web() {
 
         <div className="web-logger">
           <Logger logs={logs} onClear={() => setLogs([])} />
+        </div>
+      </div>
+
+      <div className="web-content">
+        <div className="web-stores">
+          <BrowserApiTest onLog={addLog} />
         </div>
       </div>
     </div>
