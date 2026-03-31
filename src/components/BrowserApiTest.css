@@ -1,0 +1,165 @@
+.browser-api-test {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.browser-api-test h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.browser-api-test-description {
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.browser-api-platform {
+  display: inline-block;
+  margin: 0 0 20px 0;
+  padding: 4px 10px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+}
+
+.browser-api-section {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.browser-api-section:last-child {
+  margin-bottom: 0;
+}
+
+.browser-api-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.browser-api-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.browser-api-table th {
+  text-align: left;
+  padding: 6px 8px;
+  background: #efefef;
+  color: #555;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+}
+
+.browser-api-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.browser-api-table tr:last-child td {
+  border-bottom: none;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.status-available,
+.status-granted {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-unavailable,
+.status-blocked,
+.status-permission_denied,
+.status-error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-gesture_required {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-no_device {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-pending {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.browser-api-note {
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+}
+
+.browser-api-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.browser-api-buttons button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: #007bff;
+  color: #fff;
+}
+
+.browser-api-buttons button:hover {
+  background: #0056b3;
+}
+
+.browser-api-policy {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #555;
+}
+
+.policy-feature {
+  display: inline-block;
+  margin: 2px 4px 2px 0;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.policy-feature-active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.policy-feature-inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
