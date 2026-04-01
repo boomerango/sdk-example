@@ -4,6 +4,7 @@ import { StoreTest } from '../components/StoreTest'
 import { ApiTest } from '../components/ApiTest'
 import { BrowserApiTest } from '../components/BrowserApiTest'
 import { WorkerTest } from '../components/WorkerTest'
+import { MqttTest } from '../components/MqttTest'
 import { Logger } from '../components/Logger'
 import { LogEntry } from '../types'
 import './View.css'
@@ -96,6 +97,7 @@ export function View() {
           </div>
           {showStoreTest && <StoreTest onLog={addLog} />}
           <ApiTest onLog={addLog} />
+          <MqttTest onLog={addLog} />
           <BrowserApiTest onLog={addLog} />
           {showWorkerTest && <WorkerTest onLog={addLog} />}
         </div>
