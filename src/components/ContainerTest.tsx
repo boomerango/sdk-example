@@ -1,7 +1,15 @@
 import { useState } from 'react'
-import { containers } from '@telemetryos/sdk'
-import type { Container } from '@telemetryos/sdk'
+import { request } from '@telemetryos/sdk'
 import { LogEntry } from '../types'
+
+type ContainerStatus = 'running' | 'stopped' | 'paused' | 'exited' | 'unknown'
+
+type Container = {
+  name: string
+  image: string
+  port: number
+  status?: ContainerStatus
+}
 
 interface ContainerTestProps {
   onLog: (log: Omit<LogEntry, 'id' | 'timestamp'>) => void
@@ -14,114 +22,63 @@ export function ContainerTest({ onLog }: ContainerTestProps) {
 
   const handleList = async () => {
     try {
-      const list = await containers().list()
-      setContainerList(list)
-      list.forEach((c) => {
-        onLog({
-          level: 'success',
-          method: 'containers().list',
-          message: JSON.stringify(c),
-        })
+      const res = (await request('containers.list', {})) as { containers: Container[] }
+      setContainerList(res.containers)
+      res.containers.forEach((c) => {
+        onLog({ level: 'success', method: 'containers.list', message: JSON.stringify(c) })
       })
-      if (list.length === 0) {
-        onLog({
-          level: 'info',
-          method: 'containers().list',
-          message: 'No containers found',
-        })
+      if (res.containers.length === 0) {
+        onLog({ level: 'info', method: 'containers.list', message: 'No containers found' })
       }
     } catch (error: any) {
-      onLog({
-        level: 'error',
-        method: 'containers().list',
-        message: error.message,
-      })
+      onLog({ level: 'error', method: 'containers.list', message: error.message })
     }
   }
 
   const handleRun = async () => {
     try {
-      const status = await containers().run(containerName)
-      onLog({
-        level: 'success',
-        method: 'containers().run',
-        message: `Status: ${status}`,
-      })
+      const res = (await request('containers.run', { name: containerName })) as { status: ContainerStatus }
+      onLog({ level: 'success', method: 'containers.run', message: `Status: ${res.status}` })
     } catch (error: any) {
-      onLog({
-        level: 'error',
-        method: 'containers().run',
-        message: error.message,
-      })
+      onLog({ level: 'error', method: 'containers.run', message: error.message })
     }
   }
 
   const handleStop = async () => {
     try {
-      const status = await containers().stop(containerName)
-      onLog({
-        level: 'success',
-        method: 'containers().stop',
-        message: `Status: ${status}`,
-      })
+      const res = (await request('containers.stop', { name: containerName })) as { status: ContainerStatus }
+      onLog({ level: 'success', method: 'containers.stop', message: `Status: ${res.status}` })
     } catch (error: any) {
-      onLog({
-        level: 'error',
-        method: 'containers().stop',
-        message: error.message,
-      })
+      onLog({ level: 'error', method: 'containers.stop', message: error.message })
     }
   }
 
   const handleResume = async () => {
     try {
-      const status = await containers().resume(containerName)
-      onLog({
-        level: 'success',
-        method: 'containers().resume',
-        message: `Status: ${status}`,
-      })
+      const res = (await request('containers.resume', { name: containerName })) as { status: ContainerStatus }
+      onLog({ level: 'success', method: 'containers.resume', message: `Status: ${res.status}` })
     } catch (error: any) {
-      onLog({
-        level: 'error',
-        method: 'containers().resume',
-        message: error.message,
-      })
+      onLog({ level: 'error', method: 'containers.resume', message: error.message })
     }
   }
 
   const handleDelete = async () => {
     try {
-      await containers().delete(containerName)
-      onLog({
-        level: 'success',
-        method: 'containers().delete',
-        message: `Container "${containerName}" deleted successfully`,
-      })
+      const res = (await request('containers.delete', { name: containerName })) as { success: boolean }
+      if (!res.success) throw new Error(`Failed to delete container: ${containerName}`)
+      onLog({ level: 'success', method: 'containers.delete', message: `Container "${containerName}" deleted successfully` })
     } catch (error: any) {
-      onLog({
-        level: 'error',
-        method: 'containers().delete',
-        message: error.message,
-      })
+      onLog({ level: 'error', method: 'containers.delete', message: error.message })
     }
   }
 
   const handleGetLogs = async () => {
     try {
-      const logs = await containers().getLogs(containerName, { lines: 50 })
-      setContainerLogs(logs)
-      onLog({
-        level: 'success',
-        method: 'containers().getLogs',
-        message: `Retrieved ${logs.length} log lines for "${containerName}"`,
-      })
+      const res = (await request('containers.getLogs', { name: containerName, lines: 50 })) as { logs: string[] }
+      setContainerLogs(res.logs)
+      onLog({ level: 'success', method: 'containers.getLogs', message: `Retrieved ${res.logs.length} log lines for "${containerName}"` })
     } catch (error: any) {
-      onLog({
-        level: 'error',
-        method: 'containers().getLogs',
-        message: error.message,
-      })
+      onLog({ level: 'error', method: 'containers.getLogs', message: error.message })
     }
   }
 
