@@ -5,6 +5,7 @@ import { ApiTest } from '../components/ApiTest'
 import { BrowserApiTest } from '../components/BrowserApiTest'
 import { WorkerTest } from '../components/WorkerTest'
 import { MqttTest } from '../components/MqttTest'
+import { ContainerTest } from '../components/ContainerTest'
 import { Logger } from '../components/Logger'
 import { LogEntry } from '../types'
 import './View.css'
@@ -40,6 +41,7 @@ export function View() {
   }, [])
   const [showStoreTest, setShowStoreTest] = useState(false)
   const [showWorkerTest, setShowWorkerTest] = useState(false)
+  const [showContainerTest, setShowContainerTest] = useState(false)
 
   const addLog = useCallback((log: Omit<LogEntry, 'id' | 'timestamp'>) => {
     const newLog: LogEntry = {
@@ -94,12 +96,16 @@ export function View() {
             <button onClick={() => setShowWorkerTest(!showWorkerTest)}>
               {showWorkerTest ? 'Hide' : 'Show'} Worker Test
             </button>
+            <button onClick={() => setShowContainerTest(!showContainerTest)}>
+              {showContainerTest ? 'Hide' : 'Show'} Container Test
+            </button>
           </div>
           {showStoreTest && <StoreTest onLog={addLog} />}
           <ApiTest onLog={addLog} />
           <MqttTest onLog={addLog} />
           <BrowserApiTest onLog={addLog} />
           {showWorkerTest && <WorkerTest onLog={addLog} />}
+          {showContainerTest && <ContainerTest onLog={addLog} />}
         </div>
         <div className="view-logger">
           <Logger logs={logs} onClear={clearLogs} />
