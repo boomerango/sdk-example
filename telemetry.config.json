@@ -1,6 +1,6 @@
 {
   "name": "example_sdk_app",
-  "version": "3.0.4",
+  "version": "3.0.6",
   "description": "Example editor and renderer for TelemetryOS",
   "mountPoints": {
     "render": "/view",
@@ -8,13 +8,13 @@
     "home": "/",
     "web": "/example_sdk_app"
   },
-    "backgroundWorkers": {
+  "backgroundWorkers": {
     "background": "workers/background.js"
   },
   "useSpaRouting": true,
   "devServer": {
-    "runCommand": "vite --port 3000",
-    "url": "http://localhost:3000"
+    "runCommand": "vite --port $PORT",
+    "url": "http://localhost:$PORT",
+    "readyPattern": "VITE.*ready in"
   }
 }
-
