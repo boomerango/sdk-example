@@ -444,6 +444,27 @@ export function ApiTest({ onLog }: ApiTestProps) {
     }
   }
 
+  const testDevicesGetCapabilities = async () => {
+    try {
+      const result = await devices().getCapabilities()
+      onLog({
+        level: 'success',
+        method: 'devices().getCapabilities',
+        message: `Retrieved device capabilities`,
+        data: result,
+      })
+      console.log('Devices getCapabilities result:', result)
+    } catch (error: any) {
+      onLog({
+        level: 'error',
+        method: 'devices().getCapabilities',
+        message: `Failed to get device capabilities: ${error.message}`,
+        data: { error: error.message, stack: error.stack },
+      })
+      console.error('Devices getCapabilities error:', error)
+    }
+  }
+
   // Proxy API
   const testProxyFetch = async () => {
     if (!proxyUrl.trim()) {
@@ -1014,6 +1035,9 @@ export function ApiTest({ onLog }: ApiTestProps) {
         <div className="api-test-buttons">
           <button onClick={testDevicesGetInformation} className="btn btn-primary">
             Get Device Information
+          </button>
+          <button onClick={testDevicesGetCapabilities} className="btn btn-primary">
+            Get Device Capabilities
           </button>
         </div>
       </div>
