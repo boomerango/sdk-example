@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { configure, globalClient } from '@telemetryos/sdk'
-import { name } from '~/telemetry.config.json'
+import { name, version } from '~/telemetry.config.json'
 import { Logger } from '../components/Logger'
 import { BrowserApiTest } from '../components/BrowserApiTest'
 import { LogEntry } from '../types'
@@ -104,7 +104,7 @@ export function Web() {
   return (
     <div className="web">
       <div className="web-header">
-        <h1>TelemetryOS SDK Example — Web</h1>
+        <h1>TelemetryOS SDK Example — Web <span className="web-version">v{version}</span></h1>
         <p className="web-subtitle">
           Web mount point: browser-accessible, no device context.
           Only <code>application</code> and <code>shared(namespace)</code> store scopes are available.
