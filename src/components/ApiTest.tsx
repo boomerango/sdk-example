@@ -5,13 +5,24 @@ import {
   media,
   applications,
   playlist,
-  overrides,
   devices,
   proxy,
   weather,
   environment,
 } from '@telemetryos/sdk'
 import { LogEntry } from '../types'
+
+// NOTE: `overrides` is not exported by the published @telemetryos/sdk (^1.24.2);
+// it exists only in the unreleased SDK source. Local stub so the app builds
+// against the latest published SDK; calls report that the API is unavailable.
+const overrides = () => ({
+  async setOverride(_name: string): Promise<unknown> {
+    throw new Error('overrides API not available in published @telemetryos/sdk')
+  },
+  async clearOverride(_name: string): Promise<unknown> {
+    throw new Error('overrides API not available in published @telemetryos/sdk')
+  },
+})
 import './ApiTest.css'
 
 interface ApiTestProps {
