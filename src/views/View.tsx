@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { configure, globalClient } from '@telemetryos/sdk'
+import { version } from '~/telemetry.config.json'
 import { StoreTest } from '../components/StoreTest'
 import { ApiTest } from '../components/ApiTest'
 import { BrowserApiTest } from '../components/BrowserApiTest'
@@ -81,7 +82,7 @@ export function View() {
   return (
     <div className="view">
       <div className="view-header">
-        <h1>TelemetryOS SDK Example - View 3.0.4</h1>
+        <h1>TelemetryOS SDK Example - View v{version}</h1>
         <p className="view-subtitle">
           Testing SDK functionality in the render/view mount point
         </p>
