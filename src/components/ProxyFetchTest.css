@@ -1,0 +1,102 @@
+.proxy-fetch-test {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.proxy-fetch-test h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.proxy-fetch-description {
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.proxy-fetch-description code,
+.proxy-fetch-notes code {
+  background: #f0f0f0;
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 12px;
+}
+
+.proxy-fetch-status {
+  margin: 0 0 16px 0;
+  padding: 8px 12px;
+  background: #f7f7f7;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #444;
+}
+
+.proxy-fetch-status-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.proxy-fetch-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.proxy-fetch-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+  flex: 1 1 180px;
+}
+
+.proxy-fetch-field-wide {
+  flex: 3 1 320px;
+}
+
+.proxy-fetch-hint {
+  font-weight: 400;
+  color: #888;
+}
+
+.proxy-fetch-input {
+  padding: 8px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.proxy-fetch-input:focus {
+  outline: none;
+  border-color: #4a90d9;
+}
+
+.proxy-fetch-textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.proxy-fetch-buttons {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0 16px 0;
+}
+
+.proxy-fetch-notes {
+  margin: 0;
+  padding-left: 20px;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.6;
+}
