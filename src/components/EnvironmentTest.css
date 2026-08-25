@@ -1,0 +1,152 @@
+.environment-test {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.environment-test h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.environment-test-description {
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.environment-test-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.environment-test-readout-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #f4f7f4;
+  border: 1px solid #d9e2d9;
+  border-radius: 6px;
+  padding: 8px 12px;
+  min-width: 140px;
+}
+
+.environment-test-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7d6b;
+}
+
+.environment-test-value {
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  font-size: 14px;
+  color: #222;
+}
+
+.environment-test-error {
+  background: #fdecea;
+  border: 1px solid #f5c2bd;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  color: #a32b1c;
+  font-size: 13px;
+}
+
+.environment-test-section {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.environment-test-section:last-child {
+  margin-bottom: 0;
+}
+
+.environment-test-section h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.environment-test-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.environment-test-events {
+  list-style: none;
+  margin: 12px 0 0 0;
+  padding: 0;
+  max-height: 160px;
+  overflow-y: auto;
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.environment-test-events li {
+  display: flex;
+  gap: 10px;
+  padding: 4px 0;
+  border-bottom: 1px solid #ececec;
+  color: #333;
+}
+
+.environment-test-events li:last-child {
+  border-bottom: none;
+}
+
+.environment-test-event-time {
+  color: #888;
+}
+
+/* Button styles are scoped to this panel rather than declared globally: the
+   shared `.btn` rules live in StoreTest.css and Web.css, neither of which is
+   loaded by the settings view, and this panel renders in all three views. */
+.environment-test .btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.environment-test .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.environment-test .btn:active {
+  transform: translateY(0);
+}
+
+.environment-test .btn-primary {
+  background: #4caf50;
+  color: white;
+}
+
+.environment-test .btn-primary:hover {
+  background: #45a049;
+}
+
+.environment-test .btn-secondary {
+  background: #d98c00;
+  color: white;
+}
+
+.environment-test .btn-secondary:hover {
+  background: #b87800;
+}

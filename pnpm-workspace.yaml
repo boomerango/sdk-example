@@ -1,0 +1,6 @@
+# sdk-example sits inside the Neo-Application-SDK checkout but is its own repo and
+# not a member of that workspace (`packages/*`). Without this file pnpm resolves the
+# parent workspace instead, reports "Already up to date", and leaves the SDK at
+# whatever version is already installed — `pnpm install` silently does nothing.
+allowBuilds:
+  esbuild: false

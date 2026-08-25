@@ -4,6 +4,7 @@ import { name, version } from '~/telemetry.config.json'
 import { Logger } from '../components/Logger'
 import { BrowserApiTest } from '../components/BrowserApiTest'
 import { ProxyFetchTest } from '../components/ProxyFetchTest'
+import { EnvironmentTest } from '../components/EnvironmentTest'
 import { LogEntry } from '../types'
 import {
   sendStoreValue,
@@ -197,6 +198,12 @@ export function Web() {
 
         <div className="web-logger">
           <Logger logs={logs} onClear={() => setLogs([])} />
+        </div>
+      </div>
+
+      <div className="web-content">
+        <div className="web-stores">
+          <EnvironmentTest onLog={addLog} />
         </div>
       </div>
 
