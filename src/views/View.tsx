@@ -3,6 +3,7 @@ import { configure, globalClient } from '@telemetryos/sdk'
 import { version } from '~/telemetry.config.json'
 import { StoreTest } from '../components/StoreTest'
 import { ApiTest } from '../components/ApiTest'
+import { EnvironmentTest } from '../components/EnvironmentTest'
 import { BrowserApiTest } from '../components/BrowserApiTest'
 import { WorkerTest } from '../components/WorkerTest'
 import { MqttTest } from '../components/MqttTest'
@@ -102,6 +103,7 @@ export function View() {
             </button>
           </div>
           {showStoreTest && <StoreTest onLog={addLog} />}
+          <EnvironmentTest onLog={addLog} />
           <ApiTest onLog={addLog} />
           <MqttTest onLog={addLog} />
           <BrowserApiTest onLog={addLog} />

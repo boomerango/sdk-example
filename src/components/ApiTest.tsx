@@ -8,11 +8,10 @@ import {
   devices,
   proxy,
   weather,
-  environment,
 } from '@telemetryos/sdk'
 import { LogEntry } from '../types'
 
-// NOTE: `overrides` is not exported by the published @telemetryos/sdk (^1.24.2);
+// NOTE: `overrides` is not exported by the published @telemetryos/sdk (^1.28.0);
 // it exists only in the unreleased SDK source. Local stub so the app builds
 // against the latest published SDK; calls report that the API is unavailable.
 const overrides = () => ({
@@ -280,29 +279,29 @@ export function ApiTest({ onLog }: ApiTestProps) {
     if (!appName.trim()) {
       onLog({
         level: 'error',
-        method: 'applications().getByName',
+        method: 'applications().getBySpecifier',
         message: `Please provide an application name`,
       })
       return
     }
 
     try {
-      const result = await applications().getByName(appName)
+      const result = await applications().getBySpecifier(appName)
       onLog({
         level: 'success',
-        method: 'applications().getByName',
+        method: 'applications().getBySpecifier',
         message: `Retrieved application by name`,
         data: { appName, result },
       })
-      console.log('Applications getByName result:', result)
+      console.log('Applications getBySpecifier result:', result)
     } catch (error: any) {
       onLog({
         level: 'error',
-        method: 'applications().getByName',
+        method: 'applications().getBySpecifier',
         message: `Failed to get application: ${error.message}`,
         data: { appName, error: error.message, stack: error.stack },
       })
-      console.error('Applications getByName error:', error)
+      console.error('Applications getBySpecifier error:', error)
     }
   }
 
@@ -784,78 +783,6 @@ export function ApiTest({ onLog }: ApiTestProps) {
     }
   }
 
-  // Environment API
-  const testEnvironmentGetColorScheme = async () => {
-    try {
-      const result = await environment().getColorScheme()
-      onLog({
-        level: 'success',
-        method: 'environment().getColorScheme',
-        message: `Retrieved current color scheme`,
-        data: { colorScheme: result },
-      })
-      console.log('Environment getColorScheme result:', result)
-    } catch (error: any) {
-      onLog({
-        level: 'error',
-        method: 'environment().getColorScheme',
-        message: `Failed to get color scheme: ${error.message}`,
-        data: { error: error.message, stack: error.stack },
-      })
-      console.error('Environment getColorScheme error:', error)
-    }
-  }
-
-  const testEnvironmentSubscribeColorScheme = async () => {
-    try {
-      const result = await environment().subscribeColorScheme((colorScheme) => {
-        onLog({
-          level: 'info',
-          method: 'environment().subscribeColorScheme',
-          message: `Color scheme changed`,
-          data: { colorScheme },
-        })
-        console.log('Color scheme changed:', colorScheme)
-      })
-      onLog({
-        level: 'success',
-        method: 'environment().subscribeColorScheme',
-        message: `Subscribed to color scheme changes`,
-        data: { success: result },
-      })
-      console.log('Environment subscribeColorScheme result:', result)
-    } catch (error: any) {
-      onLog({
-        level: 'error',
-        method: 'environment().subscribeColorScheme',
-        message: `Failed to subscribe to color scheme: ${error.message}`,
-        data: { error: error.message, stack: error.stack },
-      })
-      console.error('Environment subscribeColorScheme error:', error)
-    }
-  }
-
-  const testEnvironmentUnsubscribeColorScheme = async () => {
-    try {
-      const result = await environment().unsubscribeColorScheme()
-      onLog({
-        level: 'success',
-        method: 'environment().unsubscribeColorScheme',
-        message: `Unsubscribed from color scheme changes`,
-        data: { success: result },
-      })
-      console.log('Environment unsubscribeColorScheme result:', result)
-    } catch (error: any) {
-      onLog({
-        level: 'error',
-        method: 'environment().unsubscribeColorScheme',
-        message: `Failed to unsubscribe from color scheme: ${error.message}`,
-        data: { error: error.message, stack: error.stack },
-      })
-      console.error('Environment unsubscribeColorScheme error:', error)
-    }
-  }
-
   return (
     <div className="api-test">
       <h2>Other SDK API Tests</h2>
@@ -1186,22 +1113,6 @@ export function ApiTest({ onLog }: ApiTestProps) {
         </div>
       </div>
 
-      {/* Environment API */}
-      <div className="api-test-section">
-        <h3>Environment API</h3>
-        <p className="api-test-info">Access environment settings like color scheme</p>
-        <div className="api-test-buttons">
-          <button onClick={testEnvironmentGetColorScheme} className="btn btn-primary">
-            Get Color Scheme
-          </button>
-          <button onClick={testEnvironmentSubscribeColorScheme} className="btn btn-secondary">
-            Subscribe to Color Scheme
-          </button>
-          <button onClick={testEnvironmentUnsubscribeColorScheme} className="btn btn-secondary">
-            Unsubscribe from Color Scheme
-          </button>
-        </div>
-      </div>
     </div>
   )
 }

@@ -13,6 +13,7 @@ import {
   subscribeToSharedStoreValue,
   unsubscribeFromSharedStoreValue,
 } from '../services/sdk-store'
+import { EnvironmentTest } from '../components/EnvironmentTest'
 import { SdkStoreScope } from '../types'
 import './Edit.css'
 
@@ -323,6 +324,11 @@ export function Edit() {
               <pre>{JSON.stringify(currentUser, null, 2)}</pre>
             </div>
           )}
+        </div>
+
+        {/* Environment API */}
+        <div className="edit-section">
+          <EnvironmentTest />
         </div>
 
         {/* Scope Info */}

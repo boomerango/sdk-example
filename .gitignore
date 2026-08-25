@@ -23,3 +23,9 @@ build
 *.sublime-*
 
 .omc
+
+# TelemetryOS Developer
+.telemetryos/
+out/
+.claude/
+.mcp.json

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { mqtt } from '@telemetryos/sdk'
-import type { MqttMessage, MqttConnectionStatus } from '@telemetryos/root-sdk'
+import type { MqttMessage, MqttConnectionStatus } from '@telemetryos/sdk'
 import { LogEntry } from '../types'
 import './MqttTest.css'
 
