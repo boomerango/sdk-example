@@ -1,0 +1,137 @@
+.server-worker-test {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.server-worker-test h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.server-worker-description {
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.server-worker-description code,
+.server-worker-notes code {
+  background: #f0f0f0;
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 12px;
+}
+
+.server-worker-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.server-worker-status > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.server-worker-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #888;
+}
+
+.server-worker-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: #333;
+  overflow-wrap: anywhere;
+}
+
+.server-worker-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.server-worker-row label,
+.server-worker-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+}
+
+.server-worker-grow {
+  flex: 1 1 200px;
+}
+
+.server-worker-body {
+  margin-bottom: 12px;
+}
+
+.server-worker-test input,
+.server-worker-test select,
+.server-worker-test textarea {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: inherit;
+}
+
+.server-worker-test textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  resize: vertical;
+}
+
+.server-worker-test button {
+  padding: 8px 16px;
+  border: 1px solid #0b7285;
+  border-radius: 4px;
+  background: #0b7285;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.server-worker-test button:hover:not(:disabled) {
+  background: #095c6b;
+}
+
+.server-worker-test button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.server-worker-send {
+  width: 100%;
+}
+
+.server-worker-notes {
+  margin-top: 16px;
+  color: #666;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.server-worker-notes p {
+  margin: 0 0 6px 0;
+}

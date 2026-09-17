@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@telemetryos/sdk':
-        specifier: ^1.28.0
-        version: 1.28.0(react@19.2.4)
+        specifier: ^1.31.0
+        version: 1.31.0(@telemetryos/root-sdk@1.28.0)(react@19.2.4)
       react:
         specifier: ^19.1.1
         version: 19.2.4
@@ -25,8 +25,8 @@ importers:
         specifier: ^12.1.2
         version: 12.3.0(rollup@4.60.1)(typescript@5.9.3)
       '@telemetryos/vite-plugin-application-workers':
-        specifier: ^1.1.1
-        version: 1.2.1(vite@6.4.1(@types/node@22.19.17))
+        specifier: ^1.6.0
+        version: 1.6.0(vite@6.4.1(@types/node@22.19.17))
       '@types/node':
         specifier: ^22.15.3
         version: 22.19.17
@@ -472,16 +472,17 @@ packages:
   '@telemetryos/sdk-bridge@1.28.0':
     resolution: {integrity: sha512-pbU59bG2rnyl0X+1SRmG954qhsS6Mb93WBp+8Of1+q40P6Ncqq8QZnWTdsnYZc/KN0tnNvKtsEQ+5esjwyOUTw==}
 
-  '@telemetryos/sdk@1.28.0':
-    resolution: {integrity: sha512-Rh/JxT3QP/b3L03RBtUnry67DIu1NLqSU2nU5P3ZD27d9hTf3B5CTR6qLyIeSpTcyJ4C4sS5k3AeemPJxBYuvg==}
+  '@telemetryos/sdk@1.31.0':
+    resolution: {integrity: sha512-XLnb2mTnKk1j/0ymgnstzIxVNQKfApK4tM+lxVANRGrBKpsKkIG/qg6eMIBWFJFub8WKVnqOrklmuj/Lg6on2g==}
     peerDependencies:
+      '@telemetryos/root-sdk': ^1.28.1
       react: ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       react:
         optional: true
 
-  '@telemetryos/vite-plugin-application-workers@1.2.1':
-    resolution: {integrity: sha512-RjCTSF3nW7bJMCuVsRFudREonXv0O804cRWOImOyWfyakPRNy79dpI7Ie1RfCVuERqIdkBTqkF4C3Z//FhT47Q==}
+  '@telemetryos/vite-plugin-application-workers@1.6.0':
+    resolution: {integrity: sha512-OzO5zk9CIVqxEKfjfWclQAaUvxkLEDtkRdG08m2Gg64yuhHA7RK5qngVj7D00aBL4XOWuddrE73OqfthUEEumA==}
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0
 
@@ -1062,14 +1063,14 @@ snapshots:
     dependencies:
       zod: 3.25.76
 
-  '@telemetryos/sdk@1.28.0(react@19.2.4)':
+  '@telemetryos/sdk@1.31.0(@telemetryos/root-sdk@1.28.0)(react@19.2.4)':
     dependencies:
       '@telemetryos/root-sdk': 1.28.0
       zod: 3.25.76
     optionalDependencies:
       react: 19.2.4
 
-  '@telemetryos/vite-plugin-application-workers@1.2.1(vite@6.4.1(@types/node@22.19.17))':
+  '@telemetryos/vite-plugin-application-workers@1.6.0(vite@6.4.1(@types/node@22.19.17))':
     dependencies:
       vite: 6.4.1(@types/node@22.19.17)
 

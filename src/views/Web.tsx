@@ -4,6 +4,7 @@ import { name, version } from '~/telemetry.config.json'
 import { Logger } from '../components/Logger'
 import { BrowserApiTest } from '../components/BrowserApiTest'
 import { ProxyFetchTest } from '../components/ProxyFetchTest'
+import { ServerWorkerTest } from '../components/ServerWorkerTest'
 import { EnvironmentTest } from '../components/EnvironmentTest'
 import { LogEntry } from '../types'
 import {
@@ -210,6 +211,12 @@ export function Web() {
       <div className="web-content">
         <div className="web-stores">
           <ProxyFetchTest onLog={addLog} />
+        </div>
+      </div>
+
+      <div className="web-content">
+        <div className="web-stores">
+          <ServerWorkerTest onLog={addLog} />
         </div>
       </div>
 
