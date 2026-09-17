@@ -1,6 +1,6 @@
 {
   "name": "example_sdk_app",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "description": "Example editor and renderer for TelemetryOS",
   "mountPoints": {
     "render": "/view",
@@ -12,7 +12,7 @@
     "background": "workers/background.js"
   },
   "serverWorkers": {
-    "api": "workers/api.js"
+    "api": "dist/workers/api.js"
   },
   "useSpaRouting": true,
   "devServer": {
