@@ -14,6 +14,15 @@ export default defineConfig({
           outPath: 'workers/background.js',
         },
       ],
+      // Bundled as ESM for the Cloudflare Workers runtime and deployed by
+      // Applications-Service (ENG-3563). The outPath must match the value in
+      // telemetry.config.json's `serverWorkers` map.
+      serverWorkers: [
+        {
+          entry: 'src/workers/api.ts',
+          outPath: 'workers/api.js',
+        },
+      ],
     }),
   ],
   resolve: {
